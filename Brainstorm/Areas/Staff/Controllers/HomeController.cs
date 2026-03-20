@@ -30,7 +30,9 @@ namespace Brainstorm.Areas.Staff.Controllers
         public IActionResult Index()
         {
             IEnumerable<Idea> objIdeaList = _unitOfWork.Idea.GetAll(includeProperties: "Category,Topic,ApplicationUser");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
-            return View(objIdeaList);
+            IEnumerable<View> objViewList = _unitOfWork.View.GetAll(includeProperties: "ApplicationUser,Idea");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
+
+            return View(objViewList);
         }
         public IActionResult Upsert(int? id)
         {
