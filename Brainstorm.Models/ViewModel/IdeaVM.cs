@@ -11,6 +11,7 @@ namespace Brainstorm.Models.ViewModel
     public class IdeaVM
     {
         public Idea idea { get; set; }
+        public View view { get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem> CategoryList { get; set; }
         [ValidateNever]

@@ -135,19 +135,19 @@ namespace Brainstorm.Areas.Staff.Controllers
             return View(obj);
         }
 
-        public IActionResult ViewDetails(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic");
-            if (ideaFromDbFirst == null)
-            {
-                return NotFound();
-            }
-            return View(ideaFromDbFirst);
-        }
+        //public IActionResult ViewDetails(int? id)
+        //{
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic");
+        //    if (ideaFromDbFirst == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(ideaFromDbFirst);
+        //}
 
 
         public IActionResult Views(int id)
@@ -159,15 +159,15 @@ namespace Brainstorm.Areas.Staff.Controllers
                 VisitTime = 1,
                 IdeaId = id
             };
-            
-            //if (id == null || id == 0)
-            //{
-            //    return NotFound();
-            //}
-            //if (viewObj == null)
-            //{
-            //    return NotFound();
-            //}
+
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            if (viewObj == null)
+            {
+                return NotFound();
+            }
 
             return View(viewObj);
 
@@ -200,7 +200,7 @@ namespace Brainstorm.Areas.Staff.Controllers
 
             _unitOfWork.Save();//lưu thay đổi vào database
 
-            return RedirectToAction("ViewDetails", new { id = view.IdeaId });
+            return RedirectToAction("Views", new { id = view.IdeaId });
 
 
         }
