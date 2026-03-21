@@ -32,7 +32,15 @@ namespace Brainstorm.Areas.Staff.Controllers
 
             IEnumerable<Idea> objIdeaList = _unitOfWork.Idea.GetAll(includeProperties: "Category,Topic,ApplicationUser");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
             IEnumerable<View> objViewList = _unitOfWork.View.GetAll(includeProperties: "ApplicationUser,Idea");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
-            return View(objIdeaList);
+            // --- THÊM ĐOẠN NÀY ĐỂ HIỂN THỊ DATA CỦA CÁC MODEL KHÁC LÊN VIEWS TRONG ViewModel ---
+            IEnumerable<IdeaVM> ideaVMList = objIdeaList.Select(ideaVMItem => new IdeaVM()//sử dụng phương thức Select để chuyển đổi mỗi phần tử trong objIdeaList thành một đối tượng IdeaVM mới.
+            {
+                idea = ideaVMItem,//gán giá trị của ideaVMItem trong objIdeaList vào thuộc tính idea của IdeaVM.
+                view = objViewList.FirstOrDefault(v => v.IdeaId == ideaVMItem.Id)//lấy view có IdeaId trùng với Id của ideaVMItem trong objIdeaList. Nếu không tìm thấy sẽ trả về null.
+            });
+
+            // 3. Trả danh sách ViewModel về cho View
+            return View(ideaVMList);
         }
         public IActionResult Upsert(int? id)
         {
