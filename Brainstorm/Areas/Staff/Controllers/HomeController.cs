@@ -43,8 +43,10 @@ namespace Brainstorm.Areas.Staff.Controllers
 
                 // Thêm 2 dòng đếm số lượng này vào:
                 LikeCount = objReactList.Count(r => r.IdeaId == ideaVMItem.Id && r.ReactValue == 1),
-                DislikeCount = objReactList.Count(r => r.IdeaId == ideaVMItem.Id && r.ReactValue == -1)
-                
+                DislikeCount = objReactList.Count(r => r.IdeaId == ideaVMItem.Id && r.ReactValue == -1),
+
+                // Thêm dòng này để tính tổng lượt xem:
+                ViewCount = objViewList.Where(v => v.IdeaId == ideaVMItem.Id).Sum(v => v.VisitTime)
             });
 
             // 3. Trả danh sách ViewModel về cho View
