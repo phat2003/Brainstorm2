@@ -129,7 +129,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic");
+            var ideaFromDbFirst = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,Topic,ApplicationUser");
             if (ideaFromDbFirst == null)
             {
                 return NotFound();
