@@ -14,6 +14,7 @@ namespace Brainstorm.DataAccess.Repository.IRepository
         IDepartmentRepository Department { get; }//thuộc tính Department để truy cập các phương thức của DepartmentRepository.
         IApplicationUserRepository ApplicationUser { get; }//thuộc tính ApplicationUser để truy cập các phương thức của ApplicationUserRepository.
         IViewRepository View { get; }//thuộc tính View để truy cập các phương thức của ViewRepository.
+        IReactRepository React { get; }//thuộc tính React để truy cập các phương thức của ReactRepository.
         void Save(); //phương thức Save để lưu các thay đổi vào cơ sở dữ liệu.
     }
 }

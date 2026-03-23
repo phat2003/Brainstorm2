@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -32,11 +33,18 @@ namespace Brainstorm.Areas.Staff.Controllers
 
             IEnumerable<Idea> objIdeaList = _unitOfWork.Idea.GetAll(includeProperties: "Category,Topic,ApplicationUser");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
             IEnumerable<View> objViewList = _unitOfWork.View.GetAll(includeProperties: "ApplicationUser,Idea");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
+            IEnumerable<React> objReactList = _unitOfWork.React.GetAll(includeProperties: "ApplicationUser,Idea");//chỗ này buộc phải có includeProperties để lấy dữ liệu từ bảng Category và Topic liên kết với bảng Idea. Nếu không View này sẽ báo lỗi null.
             // --- THÊM ĐOẠN NÀY ĐỂ HIỂN THỊ DATA CỦA CÁC MODEL KHÁC LÊN VIEWS TRONG ViewModel ---
             IEnumerable<IdeaVM> ideaVMList = objIdeaList.Select(ideaVMItem => new IdeaVM()//sử dụng phương thức Select để chuyển đổi mỗi phần tử trong objIdeaList thành một đối tượng IdeaVM mới.
             {
                 idea = ideaVMItem,//gán giá trị của ideaVMItem trong objIdeaList vào thuộc tính idea của IdeaVM.
-                view = objViewList.FirstOrDefault(v => v.IdeaId == ideaVMItem.Id)//lấy view có IdeaId trùng với Id của ideaVMItem trong objIdeaList. Nếu không tìm thấy sẽ trả về null.
+                view = objViewList.FirstOrDefault(v => v.IdeaId == ideaVMItem.Id),//lấy view có IdeaId trùng với Id của ideaVMItem trong objIdeaList. Nếu không tìm thấy sẽ trả về null.
+                react = objReactList.FirstOrDefault(r => r.IdeaId == ideaVMItem.Id),//lấy react có IdeaId trùng với Id của ideaVMItem trong objIdeaList. Nếu không tìm thấy sẽ trả về null.
+
+                // Thêm 2 dòng đếm số lượng này vào:
+                LikeCount = objReactList.Count(r => r.IdeaId == ideaVMItem.Id && r.ReactValue == 1),
+                DislikeCount = objReactList.Count(r => r.IdeaId == ideaVMItem.Id && r.ReactValue == -1)
+                
             });
 
             // 3. Trả danh sách ViewModel về cho View
@@ -211,6 +219,54 @@ namespace Brainstorm.Areas.Staff.Controllers
             return RedirectToAction("Views", new { id = view.IdeaId });
 
 
+        }
+
+        [HttpPost]
+        [Authorize] // Chỉ cho phép người dùng đã đăng nhập thực hiện Like/Dislike
+        public IActionResult ReactToIdea(int ideaId, int reactValue)
+        {
+            // 1. Lấy thông tin ID của người dùng đang đăng nhập
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            string userId = claim.Value;
+
+            // 2. Tìm xem người dùng này đã từng React ý tưởng này trong Database chưa
+            var existingReact = _unitOfWork.React.GetFirstOrDefault(
+                r => r.IdeaId == ideaId && r.ApplicationUserId == userId
+            );
+
+            if (existingReact == null)
+            {
+                // TRƯỜNG HỢP A: Chưa từng tương tác -> Tạo mới
+                React newReact = new React
+                {
+                    IdeaId = ideaId,
+                    ApplicationUserId = userId,
+                    ReactValue = reactValue
+                };
+                _unitOfWork.React.Add(newReact);
+            }
+            else
+            {
+                // TRƯỜNG HỢP B: Đã từng tương tác
+                if (existingReact.ReactValue == reactValue)
+                {
+                    // Bấm lại đúng nút cũ -> Xóa tương tác (Bỏ Like/Bỏ Dislike)
+                    _unitOfWork.React.Remove(existingReact);
+                }
+                else
+                {
+                    // Đổi ý (Từ Like sang Dislike hoặc ngược lại) -> Cập nhật giá trị mới
+                    existingReact.ReactValue = reactValue;
+                    _unitOfWork.React.Update(existingReact);
+                }
+            }
+
+            // 3. Lưu các thay đổi vào Cơ sở dữ liệu
+            _unitOfWork.Save();
+
+            // 4. Tạm thời load lại trang Index sau khi xử lý xong
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Privacy()

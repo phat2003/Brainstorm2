@@ -18,16 +18,29 @@
                 </div>
                 <p class="card-text fs-5">@idea.idea.Text</p>
                 <div class="mb-2">
-                    <span class="badge bg-secondary">Lượt xem: @idea.view.VisitTime</span>
-                    @* <span class="badge bg-info text-dark">@idea.Topic.Name</span> *@
+
+                    <span class="badge bg-secondary">Lượt xem: @(idea.view?.VisitTime ?? 0)</span>
                 </div>
                 <div>
-                    <button class="btn btn-outline-primary btn-sm me-2" disabled>
-                        <i class="bi bi-hand-thumbs-up"></i> Thích
-                    </button>
-                    <button class="btn btn-outline-primary btn-sm me-2" disabled>
-                        <i class="bi bi-hand-thumbs-up"></i> Không thích
-                    </button>
+
+
+
+
+                    <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                        <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                        <input type="hidden" name="reactValue" value="1" />
+                        <button type="submit" class="btn btn-outline-success btn-sm">
+                            (@idea.LikeCount)👍 Thích
+                        </button>
+                    </form>
+
+                    <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                        <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                        <input type="hidden" name="reactValue" value="-1" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            (@idea.DislikeCount)👎 Không thích
+                        </button>
+                    </form>
                     <button class="btn btn-outline-secondary btn-sm" disabled>
                         <i class="bi bi-chat-dots"></i> Bình luận
                     </button>
