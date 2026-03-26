@@ -25,15 +25,29 @@
 
 
 
-
+                    @if (idea.react == null || idea.react.ReactValue != 1)
+                    {
                     <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
                         <input type="hidden" name="ideaId" value="@idea.idea.Id" />
                         <input type="hidden" name="reactValue" value="1" />
                         <button type="submit" class="btn btn-outline-success btn-sm">
                             (@idea.LikeCount)👍 Thích
                         </button>
-                    </form>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                            <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                            <input type="hidden" name="reactValue" value="1" />
+                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                (@idea.LikeCount)👍 Bỏ Thích
+                            </button>
+                        </form>
+                    }
 
+                    @if (idea.react == null || idea.react.ReactValue != -1)
+                    {
                     <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
                         <input type="hidden" name="ideaId" value="@idea.idea.Id" />
                         <input type="hidden" name="reactValue" value="-1" />
@@ -41,6 +55,18 @@
                             (@idea.DislikeCount)👎 Không thích
                         </button>
                     </form>
+                    }
+                    else
+                    {
+                        <form asp-area="Staff" asp-controller="Home" asp-action="ReactToIdea" method="post" style="display:inline;">
+                            <input type="hidden" name="ideaId" value="@idea.idea.Id" />
+                            <input type="hidden" name="reactValue" value="-1" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                (@idea.DislikeCount)👎 Bỏ Không thích
+                            </button>
+                        </form>
+                    }
+
                     <button class="btn btn-outline-secondary btn-sm" disabled>
                         <i class="bi bi-chat-dots"></i> Bình luận
                     </button>

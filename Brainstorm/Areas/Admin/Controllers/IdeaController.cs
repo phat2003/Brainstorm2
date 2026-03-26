@@ -179,7 +179,7 @@ namespace Brainstorm.Areas.Admin.Controllers
 
             // 2. Tìm tất cả các Lượt xem (View) tham chiếu đến Idea này
             // Điều kiện: Lấy các View có thuộc tính IdeaId bằng với id của Idea đang xóa
-            var relatedViews = _unitOfWork.View.GetAll(v => v.IdeaId == id).ToList();
+            var relatedViews = _unitOfWork.View.GetAll(v => v.IdeaId == id);
             if (relatedViews.Any())
             {
                 // Xóa danh sách View này
@@ -187,7 +187,7 @@ namespace Brainstorm.Areas.Admin.Controllers
             }
 
             // 3. Tìm tất cả các Tương tác (React) tham chiếu đến Idea này
-            var relatedReacts = _unitOfWork.React.GetAll(r => r.IdeaId == id).ToList();
+            var relatedReacts = _unitOfWork.React.GetAll(r => r.IdeaId == id);
             if (relatedReacts.Any())
             {
                 // Xóa danh sách React này
