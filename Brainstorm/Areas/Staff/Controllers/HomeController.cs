@@ -167,7 +167,7 @@ namespace Brainstorm.Areas.Staff.Controllers
         //    return View(ideaFromDbFirst);
         //}
 
-
+        [Authorize]
         public IActionResult Views(int id)
         {
             
@@ -225,16 +225,17 @@ namespace Brainstorm.Areas.Staff.Controllers
 
         [HttpPost]
         [Authorize] // Chỉ cho phép người dùng đã đăng nhập thực hiện Like/Dislike
-        public IActionResult ReactToIdea(int ideaId, int reactValue)
+        public IActionResult ReactToIdea(React react, int ideaId, int reactValue)
         {
             // 1. Lấy thông tin ID của người dùng đang đăng nhập
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            string userId = claim.Value;
+            //string userId = claim.Value;
+            react.ApplicationUserId = claim.Value;
 
             // 2. Tìm xem người dùng này đã từng React ý tưởng này trong Database chưa
             var existingReact = _unitOfWork.React.GetFirstOrDefault(
-                r => r.IdeaId == ideaId && r.ApplicationUserId == userId
+                r => r.IdeaId == ideaId && r.ApplicationUserId == react.ApplicationUserId
             );
 
             if (existingReact == null)
@@ -243,7 +244,7 @@ namespace Brainstorm.Areas.Staff.Controllers
                 React newReact = new React
                 {
                     IdeaId = ideaId,
-                    ApplicationUserId = userId,
+                    ApplicationUserId = react.ApplicationUserId,
                     ReactValue = reactValue
                 };
                 _unitOfWork.React.Add(newReact);

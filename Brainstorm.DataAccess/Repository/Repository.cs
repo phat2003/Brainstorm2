@@ -25,16 +25,22 @@ namespace Brainstorm.DataAccess.Repository
         }
 
         // include category,covertype
-        public IEnumerable<T> GetAll(string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = DbSet;//khởi tạo một truy vấn IQueryable từ DbSet.
+
+            if (filter != null)
+            {
+                query = query.Where(filter);//lọc các đối tượng trong DbSet theo điều kiện được cung cấp trong filter.
+            }
+            
             if (includeProperties != null)
             {
                 foreach (var item in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(item);//nếu includeProperties khác null thì truy vấn sẽ bao gồm các thuộc tính liên quan được chỉ định trong includeProperties. 
                 }
-
+                
             }
             return query.ToList(); //trả về danh sách tất cả các đối tượng trong DbSet.
         }

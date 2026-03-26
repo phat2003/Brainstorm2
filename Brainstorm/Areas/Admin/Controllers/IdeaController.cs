@@ -136,34 +136,73 @@ namespace Brainstorm.Areas.Admin.Controllers
             }
             return View(ideaFromDbFirst);
         }
-        [HttpPost]
-        public IActionResult DeletePost(int? id)
-        {
-            var obj = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id);
+        //[HttpPost]
+        //public IActionResult DeletePost(int? id)
+        //{
+        //    var obj = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id);
 
+        //    if (obj == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    else
+        //    {
+        //        if (obj.FilePath != null)
+        //        {
+        //            string wwwRootPath = _webHostEnvironment.WebRootPath;
+        //            //this is an edit and we need to remove old image
+        //            var oldImagePath = Path.Combine(wwwRootPath, obj.FilePath.TrimStart('\\'));
+        //            if (System.IO.File.Exists(oldImagePath))
+        //            {
+        //                System.IO.File.Delete(oldImagePath);
+        //            }
+        //        }
+        //        _unitOfWork.Idea.Remove(obj);
+        //        _unitOfWork.Save();
+        //        TempData["Sucess"] = "Category Delete sucessfully";
+        //        return RedirectToAction("index");
+
+        //    }
+        //    return View(obj);
+        //}
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePost(int? id) // Giả định khóa chính Idea của bạn là kiểu int
+        {
+            // 1. Lấy thông tin Idea cần xóa từ CSDL
+            var obj = _unitOfWork.Idea.GetFirstOrDefault(u => u.Id == id);
             if (obj == null)
             {
                 return NotFound();
             }
-            else
-            {
-                if (obj.FilePath != null)
-                {
-                    string wwwRootPath = _webHostEnvironment.WebRootPath;
-                    //this is an edit and we need to remove old image
-                    var oldImagePath = Path.Combine(wwwRootPath, obj.FilePath.TrimStart('\\'));
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-                _unitOfWork.Idea.Remove(obj);
-                _unitOfWork.Save();
-                TempData["Sucess"] = "Category Delete sucessfully";
-                return RedirectToAction("index");
 
+            // 2. Tìm tất cả các Lượt xem (View) tham chiếu đến Idea này
+            // Điều kiện: Lấy các View có thuộc tính IdeaId bằng với id của Idea đang xóa
+            var relatedViews = _unitOfWork.View.GetAll(v => v.IdeaId == id).ToList();
+            if (relatedViews.Any())
+            {
+                // Xóa danh sách View này
+                _unitOfWork.View.removeRange(relatedViews);
             }
-            return View(obj);
+
+            // 3. Tìm tất cả các Tương tác (React) tham chiếu đến Idea này
+            var relatedReacts = _unitOfWork.React.GetAll(r => r.IdeaId == id).ToList();
+            if (relatedReacts.Any())
+            {
+                // Xóa danh sách React này
+                _unitOfWork.React.removeRange(relatedReacts);
+            }
+
+            // 4. Sau khi các dữ liệu liên quan đã bị xóa, ta có thể xóa Idea một cách an toàn
+            _unitOfWork.Idea.Remove(obj);
+
+            // 5. Lưu toàn bộ thay đổi xuống Cơ sở dữ liệu
+            _unitOfWork.Save();
+
+            // Thông báo thành công và chuyển hướng về trang danh sách
+            TempData["success"] = "Đã xóa Idea thành công!";
+            return RedirectToAction("Index");
         }
     }
 }

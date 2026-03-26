@@ -36,7 +36,7 @@ namespace Brainstorm.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Brainstorm.Models.Department", b =>
@@ -53,7 +53,7 @@ namespace Brainstorm.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("Brainstorm.Models.Idea", b =>
@@ -92,7 +92,7 @@ namespace Brainstorm.DataAccess.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("Ideas");
+                    b.ToTable("Ideas", (string)null);
                 });
 
             modelBuilder.Entity("Brainstorm.Models.React", b =>
@@ -119,7 +119,7 @@ namespace Brainstorm.DataAccess.Migrations
 
                     b.HasIndex("IdeaId");
 
-                    b.ToTable("Reacts");
+                    b.ToTable("Reacts", (string)null);
                 });
 
             modelBuilder.Entity("Brainstorm.Models.Topic", b =>
@@ -142,7 +142,7 @@ namespace Brainstorm.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Topics");
+                    b.ToTable("Topics", (string)null);
                 });
 
             modelBuilder.Entity("Brainstorm.Models.View", b =>
@@ -169,7 +169,7 @@ namespace Brainstorm.DataAccess.Migrations
 
                     b.HasIndex("IdeaId");
 
-                    b.ToTable("Views");
+                    b.ToTable("Views", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
